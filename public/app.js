@@ -473,7 +473,6 @@ function displayPoll(pollData) {
                 <div class="poll-option-bar" style="width: ${percentage}%"></div>
                 <div class="poll-option-header">
                     <div class="poll-option-label">
-                        <span class="poll-option-emoji">${option.emoji}</span>
                         <span>${option.name}</span>
                     </div>
                     <span class="poll-option-votes">${option.vote_count} ${option.vote_count === 1 ? 'hlas' : option.vote_count < 5 ? 'hlasy' : 'hlasov'}</span>
@@ -540,18 +539,10 @@ async function addCustomOption() {
     }
 
     const nameInput = document.getElementById('customOptionName');
-    const emojiInput = document.getElementById('customOptionEmoji');
-    
     const name = nameInput.value.trim();
-    const emoji = emojiInput.value.trim();
 
     if (!name) {
         showPollMessage('Zadaj názov jedla!', 'error');
-        return;
-    }
-
-    if (!emoji) {
-        showPollMessage('Pridaj emoji!', 'error');
         return;
     }
 
@@ -563,7 +554,7 @@ async function addCustomOption() {
             },
             body: JSON.stringify({ 
                 name,
-                emoji,
+                emoji: '',
                 guest_id: currentGuest.id
             })
         });
@@ -572,7 +563,6 @@ async function addCustomOption() {
         
         if (response.ok) {
             nameInput.value = '';
-            emojiInput.value = '';
             loadPoll();
             showPollMessage(`Možnosť "${name}" pridaná! 🎉`, 'success');
         } else {

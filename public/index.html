@@ -46,7 +46,7 @@
                 <!-- Google Maps -->
                 <div class="map-container">
                     <iframe 
-                        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Horovo+náměstí+1074/2,+Praha+8&zoom=15"
+                        src="https://www.google.com/maps?q=Horovo+náměstí+1074/2,+Praha+8&output=embed&z=15"
                         width="100%" 
                         height="300" 
                         style="border:0; border-radius: 15px; margin-top: 20px;" 
@@ -64,6 +64,18 @@
                     <button onclick="downloadICS()" class="btn btn-calendar-secondary">
                         📥 Stiahnuť ICS súbor
                     </button>
+                </div>
+
+                <!-- Description -->
+                <div class="party-description">
+                    <h3>Dekolaudačka 101</h3>
+                    <p>
+                        Keďže sa ideme konečne odfakovať z tohto baráku, chceli by sme to poriadne osláviť! 
+                        Všetko bude - kurvy, chlast, i chlebíčky. Pozývame všetkých, ktorí sú nejako prepletený s týmto bytom, napríklad takých, ktorí už tu hodili voľajakú prskavku o zem, alebo to tu začmudili cigaretovým dymom. A kamarátov, ofc.
+                    </p>
+                    <p>
+                        Dones si pivo, víno, močku, pálenku, whatever. Najesť dostaneš. 🍻
+                    </p>
                 </div>
             </div>
         </section>
@@ -124,12 +136,6 @@
                             id="customOptionName" 
                             placeholder="Napr. Kebab, Gyros, Langoš..." 
                             maxlength="50"
-                        >
-                        <input 
-                            type="text" 
-                            id="customOptionEmoji" 
-                            placeholder="Emoji (napr. 🥙)" 
-                            maxlength="4"
                         >
                         <button onclick="addCustomOption()" class="btn btn-primary">
                             ➕ Pridať možnosť
