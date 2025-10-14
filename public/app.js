@@ -136,32 +136,30 @@ async function handleComment() {
 
     const commentInput = document.getElementById('commentInput');
     const comment = commentInput.value.trim();
-    
-    if (!comment) {
-        return;
-    }
+    if (!comment) return;
+
+    const btn = document.querySelector('#commentForm button');
+    btn.disabled = true;
+    btn.textContent = 'Odosielam...';
 
     try {
         const response = await fetch(`${API_URL}/api/comments`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                guest_id: currentGuest.id, 
-                comment 
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ guest_id: currentGuest.id, comment })
         });
 
         if (response.ok) {
             commentInput.value = '';
             loadComments();
         } else {
-            const data = await response.json();
-            showMessage('Chyba: ' + data.error, 'error');
+            showMessage('Chyba: ' + (await response.json()).error, 'error');
         }
     } catch (error) {
-        showMessage('Chyba pri odosielaní komentára: ' + error.message, 'error');
+        showMessage('Chyba: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Odoslať';
     }
 }
 
@@ -219,16 +217,15 @@ async function handlePhoto() {
     if (!photoUrl) return;
     photoUrl = convertGoogleDriveUrl(photoUrl);
 
+    const btn = document.querySelector('#photoForm button');
+    btn.disabled = true;
+    btn.textContent = 'Pridávam...';
+
     try {
         const response = await fetch(`${API_URL}/api/photos`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                guest_id: currentGuest.id, 
-                photo_url: photoUrl 
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ guest_id: currentGuest.id, photo_url: photoUrl })
         });
 
         if (response.ok) {
@@ -236,11 +233,13 @@ async function handlePhoto() {
             loadPhotos();
             showMessage('Fotka pridaná! 📸', 'success');
         } else {
-            const data = await response.json();
-            showMessage('Chyba: ' + data.error, 'error');
+            showMessage('Chyba: ' + (await response.json()).error, 'error');
         }
     } catch (error) {
-        showMessage('Chyba pri pridávaní fotky: ' + error.message, 'error');
+        showMessage('Chyba: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Pridať fotku';
     }
 }
 
