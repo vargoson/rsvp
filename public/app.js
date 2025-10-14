@@ -214,7 +214,8 @@ async function handlePhoto() {
         return;
     }
 
-    let photoUrl = document.getElementById('photoUrlInput').value.trim();
+    const input = document.getElementById('photoUrlInput');
+    let photoUrl = input.value.trim();
     if (!photoUrl) return;
     photoUrl = convertGoogleDriveUrl(photoUrl);
 
@@ -231,7 +232,7 @@ async function handlePhoto() {
         });
 
         if (response.ok) {
-            photoUrlInput.value = '';
+            input.value = '';
             loadPhotos();
             showMessage('Fotka pridaná! 📸', 'success');
         } else {
