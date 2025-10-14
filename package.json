@@ -2,7 +2,7 @@
   "name": "dekolaudacka-party",
   "version": "1.0.0",
   "description": "Microsite for farewell party with RSVP and guest list",
-  "main": "server.js",
+  "main": "server-postgres.js",
   "scripts": {
     "start": "node server-postgres.js",
     "start:sqlite": "node server.js",
