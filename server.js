@@ -320,8 +320,8 @@ app.post('/api/poll/vote', (req, res) => {
 app.post('/api/poll/add-option', (req, res) => {
   const { name, emoji, guest_id } = req.body;
   
-  if (!name || !emoji || !guest_id) {
-    return res.status(400).json({ error: 'Name, emoji, and guest ID required' });
+  if (!name || !guest_id) {
+    return res.status(400).json({ error: 'Name and guest ID required' });
   }
 
   // Check if option already exists
@@ -338,7 +338,7 @@ app.post('/api/poll/add-option', (req, res) => {
 
     // Insert new option
     db.run('INSERT INTO poll_options (name, emoji) VALUES (?, ?)', 
-      [name, emoji], 
+      [name, emoji || ''], 
       function(err) {
         if (err) {
           res.status(500).json({ error: err.message });
