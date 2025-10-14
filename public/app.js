@@ -61,7 +61,9 @@ function updateUserInterface() {
         document.getElementById('userInfo').style.display = 'block';
         document.getElementById('userInfoPhotos').style.display = 'block';
         document.getElementById('commentForm').style.display = 'block';
+        document.getElementById('addOptionForm').style.display = 'block';
         loadComments(); // Reload to show form
+        loadPoll(); // Reload poll to show add option form
     }
 }
 
@@ -381,6 +383,60 @@ function convertGoogleDriveUrl(url) {
     return url;
 }
 
+// Calendar functions
+
+function addToGoogleCalendar() {
+    // Event details
+    const event = {
+        text: 'Dekolaudačka 🎉',
+        dates: '20251024T190000/20251024T230000', // Format: YYYYMMDDTHHMMSS
+        details: 'Posledná párty pred odchodom z domu! Nezabudni prísť! 🎊',
+        location: 'Horovo náměstí 1074/2, Prague',
+        ctz: 'Europe/Prague'
+    };
+    
+    const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.text)}&dates=${event.dates}&details=${encodeURIComponent(event.details)}&location=${encodeURIComponent(event.location)}&ctz=${event.ctz}`;
+    
+    window.open(googleCalUrl, '_blank');
+}
+
+function downloadICS() {
+    // Generate ICS file for Apple Calendar, Outlook, etc.
+    const event = {
+        title: 'Dekolaudačka 🎉',
+        start: '20251024T190000', // 7 PM
+        end: '20251024T230000',   // 11 PM
+        description: 'Posledná párty pred odchodom z domu! Nezabudni prísť! 🎊',
+        location: 'Horovo náměstí 1074/2, Prague'
+    };
+    
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Dekolaudačka//Party//SK
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+DTSTART:${event.start}
+DTEND:${event.end}
+DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
+SUMMARY:${event.title}
+DESCRIPTION:${event.description}
+LOCATION:${event.location}
+STATUS:CONFIRMED
+SEQUENCE:0
+END:VEVENT
+END:VCALENDAR`;
+
+    // Create blob and download
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'dekolaudacka.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // Poll functions
 
 async function loadPoll() {
@@ -475,5 +531,55 @@ function showPollMessage(text, type = 'success') {
     setTimeout(() => {
         messageDiv.classList.remove('show');
     }, 3000);
+}
+
+async function addCustomOption() {
+    if (!currentGuest) {
+        showPollMessage('Najprv sa prihlás cez RSVP!', 'error');
+        return;
+    }
+
+    const nameInput = document.getElementById('customOptionName');
+    const emojiInput = document.getElementById('customOptionEmoji');
+    
+    const name = nameInput.value.trim();
+    const emoji = emojiInput.value.trim();
+
+    if (!name) {
+        showPollMessage('Zadaj názov jedla!', 'error');
+        return;
+    }
+
+    if (!emoji) {
+        showPollMessage('Pridaj emoji!', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/poll/add-option`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                name,
+                emoji,
+                guest_id: currentGuest.id
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            nameInput.value = '';
+            emojiInput.value = '';
+            loadPoll();
+            showPollMessage(`Možnosť "${name}" pridaná! 🎉`, 'success');
+        } else {
+            showPollMessage('Chyba: ' + data.error, 'error');
+        }
+    } catch (error) {
+        showPollMessage('Chyba pri pridávaní: ' + error.message, 'error');
+    }
 }
 

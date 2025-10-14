@@ -316,6 +316,57 @@ app.post('/api/poll/vote', (req, res) => {
   );
 });
 
+// Add custom poll option
+app.post('/api/poll/add-option', (req, res) => {
+  const { name, emoji, guest_id } = req.body;
+  
+  if (!name || !emoji || !guest_id) {
+    return res.status(400).json({ error: 'Name, emoji, and guest ID required' });
+  }
+
+  // Check if option already exists
+  db.get('SELECT id FROM poll_options WHERE LOWER(name) = LOWER(?)', [name], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+
+    if (row) {
+      res.status(400).json({ error: 'Táto možnosť už existuje!' });
+      return;
+    }
+
+    // Insert new option
+    db.run('INSERT INTO poll_options (name, emoji) VALUES (?, ?)', 
+      [name, emoji], 
+      function(err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        
+        // Automatically vote for the new option
+        const optionId = this.lastID;
+        db.run('INSERT INTO poll_votes (guest_id, option_id) VALUES (?, ?)', 
+          [guest_id, optionId],
+          function(voteErr) {
+            if (voteErr) {
+              console.error('Error auto-voting:', voteErr);
+            }
+          }
+        );
+        
+        res.json({ 
+          id: optionId, 
+          name, 
+          emoji, 
+          message: 'Option added successfully' 
+        });
+      }
+    );
+  });
+});
+
 // Serve index.html for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
