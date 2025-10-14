@@ -1,0 +1,472 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #FF6B6B;
+    --secondary: #4ECDC4;
+    --accent: #FFE66D;
+    --dark: #2D3142;
+    --light: #F8F9FA;
+    --success: #51CF66;
+    --danger: #FF6B6B;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--dark);
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.6s ease;
+}
+
+.title {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    opacity: 0.95;
+}
+
+/* Card */
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    margin-bottom: 30px;
+    animation: fadeInUp 0.6s ease;
+}
+
+/* RSVP Form */
+.rsvp-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--dark);
+}
+
+#rsvpForm input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    transition: border-color 0.3s;
+}
+
+#rsvpForm input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-yes {
+    background: var(--success);
+    color: white;
+}
+
+.btn-yes:hover {
+    background: #40c057;
+}
+
+.btn-no {
+    background: #868e96;
+    color: white;
+}
+
+.btn-no:hover {
+    background: #6c757d;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #fa5252;
+}
+
+/* Messages */
+.message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    display: none;
+}
+
+.message.show {
+    display: block;
+    animation: slideIn 0.3s ease;
+}
+
+.message.success {
+    background: #d3f9d8;
+    color: #2b8a3e;
+}
+
+.message.error {
+    background: #ffe3e3;
+    color: #c92a2a;
+}
+
+/* Guest Bubbles */
+.guests-section {
+    margin-bottom: 30px;
+}
+
+.guests-section h2,
+.guests-section h3 {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.not-attending-title {
+    margin-top: 30px;
+    font-size: 1.3rem;
+}
+
+.bubbles-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    min-height: 100px;
+}
+
+.bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: bounceIn 0.5s ease;
+    cursor: default;
+    transition: transform 0.3s ease;
+}
+
+.bubble:hover {
+    transform: scale(1.1);
+}
+
+.not-attending-list {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 15px;
+    min-height: 60px;
+    backdrop-filter: blur(10px);
+}
+
+.not-attending-item {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 8px 15px;
+    margin: 5px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Comments Section */
+.user-info {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#commentForm textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+#commentForm textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.comments-list {
+    margin-top: 20px;
+}
+
+.comment-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    animation: fadeIn 0.5s ease;
+    border-left: 4px solid var(--primary);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+
+.comment-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.comment-time {
+    font-size: 0.85rem;
+    color: #868e96;
+    margin-left: auto;
+}
+
+.comment-text {
+    color: #495057;
+    line-height: 1.5;
+}
+
+/* Photos Section */
+#photoForm {
+    margin-bottom: 15px;
+}
+
+#photoForm input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+#photoForm input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.photo-hint {
+    font-size: 0.9rem;
+    color: #868e96;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.photo-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    animation: fadeIn 0.5s ease;
+    aspect-ratio: 1;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.photo-item:hover img {
+    transform: scale(1.05);
+}
+
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: white;
+    padding: 10px;
+    font-size: 0.85rem;
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.card .loading {
+    color: #868e96;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    color: white;
+    margin-top: 40px;
+    padding: 20px;
+    opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .card {
+        padding: 20px;
+    }
+    
+    .button-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .bubble {
+        min-width: 70px;
+        height: 70px;
+        font-size: 0.85rem;
+    }
+    
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+

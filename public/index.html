@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dekolaudačka 🎉</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">🎉 Dekolaudačka 🎉</h1>
+            <p class="subtitle">Posledná párty pred odchodom z domu!</p>
+        </header>
+
+        <!-- RSVP Form -->
+        <section class="rsvp-section">
+            <div class="card">
+                <h2>Prídeš?</h2>
+                <form id="rsvpForm">
+                    <input 
+                        type="text" 
+                        id="nameInput" 
+                        placeholder="Tvoje meno" 
+                        required
+                        autocomplete="off"
+                    >
+                    <div class="button-group">
+                        <button type="submit" data-attending="true" class="btn btn-yes">
+                            ✓ Áno, prídem!
+                        </button>
+                        <button type="submit" data-attending="false" class="btn btn-no">
+                            ✗ Nemôžem
+                        </button>
+                    </div>
+                </form>
+                <div id="rsvpMessage" class="message"></div>
+            </div>
+        </section>
+
+        <!-- Guest List -->
+        <section class="guests-section">
+            <h2>Kto príde</h2>
+            <div id="attendingGuests" class="bubbles-container">
+                <div class="loading">Načítavam...</div>
+            </div>
+            
+            <h3 class="not-attending-title">Neprídu</h3>
+            <div id="notAttendingGuests" class="not-attending-list">
+                <div class="loading">Načítavam...</div>
+            </div>
+        </section>
+
+        <!-- Comments Section -->
+        <section class="comments-section">
+            <div class="card">
+                <h2>Správy a komentáre</h2>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span>Prihlásený/á ako: <strong id="currentUser"></strong></span>
+                </div>
+                <form id="commentForm" style="display: none;">
+                    <textarea 
+                        id="commentInput" 
+                        placeholder="Napíš správu..."
+                        rows="3"
+                    ></textarea>
+                    <button type="submit" class="btn btn-primary">Odoslať</button>
+                </form>
+                <div id="commentsList" class="comments-list">
+                    <div class="loading">Najprv sa prihlás cez RSVP...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photos Section -->
+        <section class="photos-section">
+            <div class="card">
+                <h2>Fotky z párty 📸</h2>
+                <div id="userInfoPhotos" class="user-info" style="display: none;">
+                    <form id="photoForm">
+                        <input 
+                            type="url" 
+                            id="photoUrlInput" 
+                            placeholder="Vlož Google Drive link na fotku..."
+                            required
+                        >
+                        <button type="submit" class="btn btn-primary">Pridať fotku</button>
+                    </form>
+                    <p class="photo-hint">
+                        💡 Tip: Nahraj fotku na Google Drive, nastav zdieľanie na "Ktokoľvek s linkom" a vlož link sem
+                    </p>
+                </div>
+                <div id="photosList" class="photos-grid">
+                    <div class="loading">Zatiaľ žiadne fotky...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ for the best party ever!</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
