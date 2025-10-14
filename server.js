@@ -51,6 +51,45 @@ function initDatabase() {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests (id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS poll_options (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    emoji TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS poll_votes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guest_id INTEGER NOT NULL,
+    option_id INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (guest_id) REFERENCES guests (id),
+    FOREIGN KEY (option_id) REFERENCES poll_options (id),
+    UNIQUE(guest_id, option_id)
+  )`);
+
+  // Insert default poll options if none exist
+  db.get('SELECT COUNT(*) as count FROM poll_options', [], (err, row) => {
+    if (!err && row.count === 0) {
+      const defaultOptions = [
+        { name: 'Pizza', emoji: '🍕' },
+        { name: 'Burger & hranolky', emoji: '🍔' },
+        { name: 'Sushi', emoji: '🍱' },
+        { name: 'Tacos', emoji: '🌮' },
+        { name: 'Pasta', emoji: '🍝' },
+        { name: 'Grilované mäso', emoji: '🥩' },
+        { name: 'Vegetariánske jedlo', emoji: '🥗' },
+        { name: 'Finger food (chipsiky, atď)', emoji: '🍟' }
+      ];
+
+      const stmt = db.prepare('INSERT INTO poll_options (name, emoji) VALUES (?, ?)');
+      defaultOptions.forEach(option => {
+        stmt.run(option.name, option.emoji);
+      });
+      stmt.finalize();
+    }
+  });
 }
 
 // API Routes
@@ -197,6 +236,82 @@ app.post('/api/photos', (req, res) => {
         return;
       }
       res.json({ id: this.lastID, guest_id, photo_url, message: 'Photo added' });
+    }
+  );
+});
+
+// Get poll results
+app.get('/api/poll', (req, res) => {
+  const query = `
+    SELECT 
+      po.id,
+      po.name,
+      po.emoji,
+      COUNT(pv.id) as vote_count,
+      GROUP_CONCAT(g.name) as voters
+    FROM poll_options po
+    LEFT JOIN poll_votes pv ON po.id = pv.option_id
+    LEFT JOIN guests g ON pv.guest_id = g.id
+    GROUP BY po.id
+    ORDER BY vote_count DESC, po.name ASC
+  `;
+  
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    // Convert voters string to array
+    const results = rows.map(row => ({
+      ...row,
+      voters: row.voters ? row.voters.split(',') : []
+    }));
+    res.json(results);
+  });
+});
+
+// Vote on poll (toggle vote)
+app.post('/api/poll/vote', (req, res) => {
+  const { guest_id, option_id } = req.body;
+  
+  if (!guest_id || !option_id) {
+    return res.status(400).json({ error: 'Guest ID and option ID required' });
+  }
+
+  // Check if vote already exists
+  db.get('SELECT id FROM poll_votes WHERE guest_id = ? AND option_id = ?', 
+    [guest_id, option_id], 
+    (err, row) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+
+      if (row) {
+        // Remove vote (toggle off)
+        db.run('DELETE FROM poll_votes WHERE guest_id = ? AND option_id = ?', 
+          [guest_id, option_id], 
+          function(err) {
+            if (err) {
+              res.status(500).json({ error: err.message });
+              return;
+            }
+            res.json({ message: 'Vote removed', action: 'removed' });
+          }
+        );
+      } else {
+        // Add vote
+        db.run('INSERT INTO poll_votes (guest_id, option_id) VALUES (?, ?)', 
+          [guest_id, option_id], 
+          function(err) {
+            if (err) {
+              res.status(500).json({ error: err.message });
+              return;
+            }
+            res.json({ id: this.lastID, message: 'Vote added', action: 'added' });
+          }
+        );
+      }
     }
   );
 });

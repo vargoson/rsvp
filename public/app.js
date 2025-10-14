@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGuests();
     loadComments();
     loadPhotos();
+    loadPoll();
     setupEventListeners();
     checkCurrentUser();
 });
@@ -40,6 +41,8 @@ function setupEventListeners() {
         e.preventDefault();
         handlePhoto();
     });
+
+    // Poll options - will be set up after loading
 }
 
 // Check if user is already logged in (stored in localStorage)
@@ -128,10 +131,11 @@ function displayGuests(guests) {
         attendingContainer.innerHTML = '<div class="loading">Zatiaľ nikto nepotvrdil účasť...</div>';
     } else {
         attendingContainer.innerHTML = attending.map(guest => {
-            const initials = getInitials(guest.name);
+            const emoji = getQuirkyEmoji(guest.name);
             return `
                 <div class="bubble" style="background-color: ${guest.avatar_color}" title="${guest.name}">
-                    ${initials}
+                    <div class="bubble-emoji">${emoji}</div>
+                    <div class="bubble-name">${guest.name.split(' ')[0]}</div>
                 </div>
             `;
         }).join('');
@@ -212,14 +216,14 @@ function displayComments(comments) {
     }
     
     commentsList.innerHTML = comments.map(comment => {
-        const initials = getInitials(comment.name);
+        const emoji = getQuirkyEmoji(comment.name);
         const timeAgo = getTimeAgo(comment.created_at);
         
         return `
             <div class="comment-item">
                 <div class="comment-header">
                     <div class="comment-avatar" style="background-color: ${comment.avatar_color}">
-                        ${initials}
+                        ${emoji}
                     </div>
                     <span class="comment-author">${comment.name}</span>
                     <span class="comment-time">${timeAgo}</span>
@@ -314,6 +318,30 @@ function getInitials(name) {
         .substring(0, 2);
 }
 
+function getQuirkyEmoji(name) {
+    // Quirky and unhinged emojis - animals, objects, and weird stuff
+    const quirkyEmojis = [
+        '🦖', '🦕', '🦄', '🦙', '🦥', '🦦', '🦨', '🦔', '🦇', '🐙', 
+        '🦑', '🦞', '🦀', '🐡', '🦐', '🦚', '🦜', '🦩', '🦢', '🐧',
+        '🦭', '🦈', '🐊', '🦎', '🐍', '🐢', '🦗', '🦟', '🦠', '🧫',
+        '🍄', '🌵', '🌶️', '🥑', '🍆', '🥔', '🧄', '🧅', '🥨', '🧇',
+        '🎩', '👑', '🎪', '🎭', '🎨', '🎯', '🎲', '🎰', '🧲', '🔮',
+        '🌮', '🌯', '🥙', '🧆', '🥘', '🍕', '🌭', '🍔', '🍟', '🥐',
+        '🦴', '👾', '🤖', '👽', '🛸', '🚀', '🛹', '🎸', '🥁', '🎺',
+        '🧩', '🎮', '🕹️', '🎲', '🧸', '🪀', '🪁', '🎪', '🎡', '🎢',
+        '🧙', '🧚', '🧛', '🧜', '🧝', '🧞', '🧟', '🦸', '🦹', '🥷'
+    ];
+    
+    // Generate consistent emoji based on name (same name = same emoji)
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % quirkyEmojis.length;
+    
+    return quirkyEmojis[index];
+}
+
 function showMessage(text, type = 'success') {
     const messageDiv = document.getElementById('rsvpMessage');
     messageDiv.textContent = text;
@@ -351,5 +379,101 @@ function convertGoogleDriveUrl(url) {
         return `https://drive.google.com/uc?export=view&id=${match[1]}`;
     }
     return url;
+}
+
+// Poll functions
+
+async function loadPoll() {
+    try {
+        const response = await fetch(`${API_URL}/api/poll`);
+        const pollData = await response.json();
+        
+        displayPoll(pollData);
+    } catch (error) {
+        console.error('Error loading poll:', error);
+    }
+}
+
+function displayPoll(pollData) {
+    const pollOptions = document.getElementById('pollOptions');
+    
+    if (!pollData || pollData.length === 0) {
+        pollOptions.innerHTML = '<div class="loading">Žiadne možnosti...</div>';
+        return;
+    }
+    
+    // Calculate total votes for percentages
+    const totalVotes = pollData.reduce((sum, option) => sum + option.vote_count, 0);
+    
+    pollOptions.innerHTML = pollData.map(option => {
+        const percentage = totalVotes > 0 ? (option.vote_count / totalVotes * 100).toFixed(0) : 0;
+        const hasVoted = currentGuest && option.voters && option.voters.includes(currentGuest.name);
+        const voters = option.voters || [];
+        
+        return `
+            <div class="poll-option ${hasVoted ? 'voted' : ''} ${!currentGuest ? 'disabled' : ''}" 
+                 data-option-id="${option.id}"
+                 onclick="handlePollVote(${option.id})">
+                <div class="poll-option-bar" style="width: ${percentage}%"></div>
+                <div class="poll-option-header">
+                    <div class="poll-option-label">
+                        <span class="poll-option-emoji">${option.emoji}</span>
+                        <span>${option.name}</span>
+                    </div>
+                    <span class="poll-option-votes">${option.vote_count} ${option.vote_count === 1 ? 'hlas' : option.vote_count < 5 ? 'hlasy' : 'hlasov'}</span>
+                </div>
+                ${voters.length > 0 ? `<div class="poll-option-voters">👥 ${voters.join(', ')}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    if (!currentGuest) {
+        pollOptions.innerHTML += '<p style="text-align: center; color: #868e96; margin-top: 15px; font-size: 0.9rem;">💡 Najprv sa prihlás cez RSVP, aby si mohol hlasovať</p>';
+    }
+}
+
+async function handlePollVote(optionId) {
+    if (!currentGuest) {
+        showPollMessage('Najprv sa prihlás cez RSVP!', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/poll/vote`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                guest_id: currentGuest.id,
+                option_id: optionId
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            loadPoll(); // Reload poll to show updated votes
+            if (data.action === 'added') {
+                showPollMessage('Hlas pridaný! 👍', 'success');
+            } else {
+                showPollMessage('Hlas odobratý', 'success');
+            }
+        } else {
+            showPollMessage('Chyba: ' + data.error, 'error');
+        }
+    } catch (error) {
+        showPollMessage('Chyba pri hlasovaní: ' + error.message, 'error');
+    }
+}
+
+function showPollMessage(text, type = 'success') {
+    const messageDiv = document.getElementById('pollMessage');
+    messageDiv.textContent = text;
+    messageDiv.className = `message ${type} show`;
+    
+    setTimeout(() => {
+        messageDiv.classList.remove('show');
+    }, 3000);
 }
 

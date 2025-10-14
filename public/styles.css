@@ -15,11 +15,13 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
     color: var(--dark);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -56,6 +58,68 @@ body {
     animation: fadeInUp 0.6s ease;
 }
 
+/* Party Info */
+.info-section {
+    margin-bottom: 30px;
+}
+
+.info-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.info-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content strong {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.info-content p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.map-container {
+    margin-top: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.map-container iframe {
+    display: block;
+    width: 100%;
+}
+
 /* RSVP Form */
 .rsvp-section h2 {
     text-align: center;
@@ -71,6 +135,8 @@ body {
     font-size: 1.1rem;
     margin-bottom: 15px;
     transition: border-color 0.3s;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 #rsvpForm input[type="text"]:focus {
@@ -94,6 +160,8 @@ body {
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .btn:hover {
@@ -186,24 +254,41 @@ body {
 
 .bubble {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 80px;
-    height: 80px;
+    min-width: 90px;
+    height: 90px;
     border-radius: 50%;
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     padding: 10px;
     text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     animation: bounceIn 0.5s ease;
     cursor: default;
     transition: transform 0.3s ease;
+    position: relative;
 }
 
 .bubble:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(5deg);
+}
+
+.bubble-emoji {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: 5px;
+    filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.2));
+}
+
+.bubble-name {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .not-attending-list {
@@ -225,6 +310,99 @@ body {
     animation: fadeIn 0.5s ease;
 }
 
+/* Menu Poll Section */
+.poll-section {
+    margin-bottom: 30px;
+}
+
+.poll-description {
+    text-align: center;
+    color: #868e96;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.poll-options {
+    display: grid;
+    gap: 12px;
+}
+
+.poll-option {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.poll-option:hover {
+    border-color: var(--primary);
+    transform: translateX(5px);
+}
+
+.poll-option.voted {
+    border-color: var(--primary);
+    background: #fff5f5;
+}
+
+.poll-option-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.poll-option-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.poll-option-emoji {
+    font-size: 1.5rem;
+}
+
+.poll-option-votes {
+    background: var(--primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.poll-option-bar {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,107,107,0.1) 0%, rgba(255,107,107,0.05) 100%);
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: width 0.5s ease;
+    border-radius: 12px;
+}
+
+.poll-option-voters {
+    font-size: 0.85rem;
+    color: #868e96;
+    margin-top: 5px;
+    position: relative;
+    z-index: 2;
+}
+
+.poll-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 /* Comments Section */
 .user-info {
     background: #f8f9fa;
@@ -243,6 +421,8 @@ body {
     font-family: inherit;
     margin-bottom: 10px;
     resize: vertical;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 #commentForm textarea:focus {
@@ -277,9 +457,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 1.3rem;
+    background: transparent !important;
 }
 
 .comment-author {
@@ -310,6 +489,8 @@ body {
     border-radius: 10px;
     font-size: 1rem;
     margin-bottom: 10px;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 #photoForm input:focus {
@@ -443,30 +624,231 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
     .title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
+        line-height: 1.2;
     }
     
     .subtitle {
-        font-size: 1.1rem;
+        font-size: 1rem;
+    }
+    
+    .header {
+        margin-bottom: 25px;
     }
     
     .card {
         padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Info section mobile */
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .info-item {
+        padding: 12px 15px;
+    }
+    
+    .info-icon {
+        font-size: 1.8rem;
+    }
+    
+    .info-content strong {
+        font-size: 0.8rem;
+    }
+    
+    .info-content p {
+        font-size: 1rem;
+    }
+    
+    .map-container iframe {
+        height: 250px !important;
+    }
+    
+    /* RSVP form mobile */
+    #rsvpForm input[type="text"] {
+        padding: 14px;
+        font-size: 16px; /* Prevents zoom on iOS */
     }
     
     .button-group {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+    
+    /* Guest bubbles mobile */
+    .bubbles-container {
+        padding: 15px;
+        gap: 10px;
     }
     
     .bubble {
         min-width: 70px;
         height: 70px;
+    }
+    
+    .bubble-emoji {
+        font-size: 1.6rem;
+        margin-bottom: 3px;
+    }
+    
+    .bubble-name {
+        font-size: 0.6rem;
+        letter-spacing: 0.3px;
+    }
+    
+    .not-attending-list {
+        padding: 12px;
+    }
+    
+    .not-attending-item {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+    
+    /* Sections mobile */
+    .guests-section h2,
+    .guests-section h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+    
+    .not-attending-title {
+        margin-top: 20px;
+        font-size: 1.1rem;
+    }
+    
+    /* Poll mobile */
+    .poll-description {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .poll-option {
+        padding: 12px;
+    }
+    
+    .poll-option-emoji {
+        font-size: 1.3rem;
+    }
+    
+    .poll-option-label {
+        font-size: 0.95rem;
+        gap: 8px;
+    }
+    
+    .poll-option-votes {
+        font-size: 0.8rem;
+        padding: 3px 10px;
+    }
+    
+    .poll-option-voters {
+        font-size: 0.8rem;
+    }
+    
+    /* Comments mobile */
+    .user-info {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    #commentForm textarea,
+    #photoForm input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    .comment-item {
+        padding: 12px;
+    }
+    
+    .comment-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 1.1rem;
+    }
+    
+    .comment-author {
+        font-size: 0.95rem;
+    }
+    
+    .comment-time {
+        font-size: 0.75rem;
+    }
+    
+    .comment-text {
+        font-size: 0.95rem;
+        margin-top: 5px;
+    }
+    
+    /* Photos mobile */
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+    
+    .photo-overlay {
+        font-size: 0.75rem;
+        padding: 8px;
+    }
+    
+    .photo-hint {
         font-size: 0.85rem;
     }
     
+    /* Footer mobile */
+    .footer {
+        margin-top: 30px;
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+    .title {
+        font-size: 1.8rem;
+    }
+    
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .bubble {
+        min-width: 65px;
+        height: 65px;
+    }
+    
+    .bubble-emoji {
+        font-size: 1.4rem;
+    }
+    
+    .bubble-name {
+        font-size: 0.55rem;
+    }
+    
     .photos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .info-item {
+        padding: 10px 12px;
+    }
+    
+    .card {
+        padding: 15px;
     }
 }
 

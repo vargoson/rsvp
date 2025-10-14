@@ -2,7 +2,9 @@
 <html lang="sk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Dekolaudačka - 24. októbra 2025, Horovo náměstí">
     <title>Dekolaudačka 🎉</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,6 +15,48 @@
             <h1 class="title">🎉 Dekolaudačka 🎉</h1>
             <p class="subtitle">Posledná párty pred odchodom z domu!</p>
         </header>
+
+        <!-- Party Info -->
+        <section class="info-section">
+            <div class="card info-card">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-icon">📅</span>
+                        <div class="info-content">
+                            <strong>Kedy</strong>
+                            <p>24. októbra 2025</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📍</span>
+                        <div class="info-content">
+                            <strong>Kde</strong>
+                            <p>Horovo náměstí 1074/2</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🚊</span>
+                        <div class="info-content">
+                            <strong>Doprava</strong>
+                            <p>Tram: Libeňský zámek</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Google Maps -->
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2559.1234567890123!2d14.456789!3d50.123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTDCsDA3JzI0LjQiTiAxNMKwMjcnMjQuNCJF!5e0!3m2!1sen!2scz!4v1234567890123!5m2!1sen!2scz&q=Horovo+náměstí+1074/2,+Prague"
+                        width="100%" 
+                        height="300" 
+                        style="border:0; border-radius: 15px; margin-top: 20px;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </section>
 
         <!-- RSVP Form -->
         <section class="rsvp-section">
@@ -49,6 +93,18 @@
             <h3 class="not-attending-title">Neprídu</h3>
             <div id="notAttendingGuests" class="not-attending-list">
                 <div class="loading">Načítavam...</div>
+            </div>
+        </section>
+
+        <!-- Menu Poll Section -->
+        <section class="poll-section">
+            <div class="card">
+                <h2>Čo dáme na jedlo? 🍕</h2>
+                <p class="poll-description">Hlasuj pre svoje obľúbené jedlo! (Môžeš vybrať viac možností)</p>
+                <div id="pollOptions" class="poll-options">
+                    <div class="loading">Načítavam...</div>
+                </div>
+                <div id="pollMessage" class="message"></div>
             </div>
         </section>
 
