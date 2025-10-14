@@ -301,13 +301,46 @@ function displayPhotos(photos) {
     
     photosList.innerHTML = photos.map(photo => `
         <div class="photo-item">
-            <img src="${photo.photo_url}" alt="Party photo" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E📷%3C/text%3E%3C/svg%3E'">
+            <img src="${photo.photo_url}" 
+                 alt="Party photo" 
+                 loading="lazy" 
+                 onclick="openLightbox('${photo.photo_url}', '${photo.name}')"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23ddd%22 width=%22200%22 height=%22200%22/%3E%3Ctext fill=%22%23999%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E📷%3C/text%3E%3C/svg%3E'">
             <div class="photo-overlay">
                 ${photo.name}
             </div>
         </div>
     `).join('');
 }
+
+// Lightbox functions
+function openLightbox(imageUrl, caption) {
+    const lightbox = document.getElementById('photoLightbox');
+    const lightboxImg = document.getElementById('lightboxImage');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    
+    lightbox.classList.add('active');
+    lightboxImg.src = imageUrl;
+    lightboxCaption.textContent = `Pridané: ${caption}`;
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('photoLightbox');
+    lightbox.classList.remove('active');
+    
+    // Restore body scroll
+    document.body.style.overflow = 'auto';
+}
+
+// Close lightbox on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
 
 // Utility functions
 
