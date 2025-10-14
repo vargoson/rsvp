@@ -147,14 +147,11 @@
         <section class="poll-section">
             <div class="card">
                 <h2>Čo by si rád papal? 🍕</h2>
-                <p class="poll-description"> Napíš co by si rád a/alebo hlasuj! (Môžeš vybrať viac možností)</p>
-                <div id="pollOptions" class="poll-options">
-                    <div class="loading">Načítavam...</div>
-                </div>
+                <p class="poll-description">Pridaj jedlo a hlasuj! (Môžeš vybrať viac možností)</p>
                 
                 <!-- Add custom option -->
                 <div id="addOptionForm" class="add-option-form" style="display: none;">
-                    <h3>Pridaj vlastnú možnosť</h3>
+                    <h3>Pridaj jedlo</h3>
                     <div class="add-option-inputs">
                         <input 
                             type="text" 
@@ -163,9 +160,13 @@
                             maxlength="50"
                         >
                         <button onclick="addCustomOption()" class="btn btn-primary">
-                            ➕ Pridať možnosť
+                            ➕ Pridať
                         </button>
                     </div>
+                </div>
+                
+                <div id="pollOptions" class="poll-options">
+                    <div class="loading">Načítavam...</div>
                 </div>
                 
                 <div id="pollMessage" class="message"></div>

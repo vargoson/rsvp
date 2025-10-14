@@ -334,8 +334,9 @@ function showMessage(text, type = 'success') {
 
 function getTimeAgo(timestamp) {
     const now = new Date();
-    const past = new Date(timestamp);
-    const diffMs = now - past;
+    const past = new Date(timestamp + 'Z'); // Force UTC parsing
+    const praguePast = new Date(past.getTime() + (2 * 60 * 60 * 1000)); // +2 hours for Prague
+    const diffMs = now - praguePast;
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);

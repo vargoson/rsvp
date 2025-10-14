@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Backup/Restore</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            color: #333;
+        }
+        h1 { margin-bottom: 30px; text-align: center; color: #667eea; }
+        .section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        h2 { font-size: 1.2rem; margin-bottom: 15px; color: #667eea; }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: #5568d3; transform: translateY(-2px); }
+        .btn-success { background: #51cf66; }
+        .btn-success:hover { background: #40c057; }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        .message.show { display: block; }
+        .message.success { background: #d3f9d8; color: #2b8a3e; }
+        .message.error { background: #ffe3e3; color: #c92a2a; }
+        .info { font-size: 0.9rem; color: #868e96; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Admin - Backup/Restore</h1>
+        
+        <div class="section">
+            <h2>📥 Backup databázy</h2>
+            <button class="btn btn-success" onclick="downloadBackup()">
+                💾 Stiahnuť backup
+            </button>
+            <p class="info">Stiahne všetky dáta (guests, komentáre, fotky, poll) do JSON súboru.</p>
+            <div id="backupMessage" class="message"></div>
+        </div>
+
+        <div class="section">
+            <h2>📤 Restore databázy</h2>
+            <input type="file" id="restoreFile" accept=".json">
+            <button class="btn" onclick="restoreBackup()">
+                🔄 Obnoviť z backup
+            </button>
+            <p class="info">⚠️ Toto vymaže aktuálne dáta a nahradí ich dátami z backup súboru!</p>
+            <div id="restoreMessage" class="message"></div>
+        </div>
+
+        <div class="section">
+            <h2>📋 Návod</h2>
+            <p style="line-height: 1.6; color: #495057;">
+                <strong>Pred deploymentom:</strong><br>
+                1. Klikni "Stiahnuť backup"<br>
+                2. Ulož JSON súbor niekam (Google Drive, počítač...)<br><br>
+                
+                <strong>Po redeploy:</strong><br>
+                1. Vyber stiahnutý JSON súbor<br>
+                2. Klikni "Obnoviť z backup"<br>
+                3. Hotovo! 🎉
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function downloadBackup() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Sťahujem...';
+            
+            fetch('/api/backup')
+                .then(res => res.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `dekolaudacka-backup-${Date.now()}.json`;
+                    a.click();
+                    showMessage('backupMessage', 'Backup stiahnutý! ✅', 'success');
+                })
+                .catch(err => {
+                    showMessage('backupMessage', 'Chyba: ' + err.message, 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = '💾 Stiahnuť backup';
+                });
+        }
+
+        function restoreBackup() {
+            const fileInput = document.getElementById('restoreFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('restoreMessage', 'Vyber backup súbor!', 'error');
+                return;
+            }
+
+            if (!confirm('Si si istý/á? Toto vymaže všetky aktuálne dáta!')) {
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Obnovujem...';
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const backup = JSON.parse(e.target.result);
+                
+                fetch('/api/restore', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(backup)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('restoreMessage', 'Databáza obnovená! 🎉', 'success');
+                        setTimeout(() => location.href = '/', 2000);
+                    } else {
+                        showMessage('restoreMessage', 'Chyba: ' + data.error, 'error');
+                    }
+                })
+                .catch(err => {
+                    showMessage('restoreMessage', 'Chyba: ' + err.message, 'error');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.textContent = '🔄 Obnoviť z backup';
+                });
+            };
+            reader.readAsText(file);
+        }
+
+        function showMessage(id, text, type) {
+            const msg = document.getElementById(id);
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+        }
+    </script>
+</body>
+</html>
+

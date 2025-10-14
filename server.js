@@ -59,26 +59,6 @@ function initDatabase() {
     UNIQUE(guest_id, option_id)
   )`);
 
-  db.get('SELECT COUNT(*) as count FROM poll_options', [], (err, row) => {
-    if (!err && row.count === 0) {
-      const defaultOptions = [
-        { name: 'Pizza', emoji: '🍕' },
-        { name: 'Burger & hranolky', emoji: '🍔' },
-        { name: 'Sushi', emoji: '🍱' },
-        { name: 'Tacos', emoji: '🌮' },
-        { name: 'Pasta', emoji: '🍝' },
-        { name: 'Grilované mäso', emoji: '🥩' },
-        { name: 'Vegetariánske jedlo', emoji: '🥗' },
-        { name: 'Finger food (chipsiky, atď)', emoji: '🍟' }
-      ];
-
-      const stmt = db.prepare('INSERT INTO poll_options (name, emoji) VALUES (?, ?)');
-      defaultOptions.forEach(option => {
-        stmt.run(option.name, option.emoji);
-      });
-      stmt.finalize();
-    }
-  });
 }
 
 app.get('/api/guests', (req, res) => {
@@ -200,6 +180,77 @@ app.post('/api/poll/add-option', (req, res) => {
       db.run('INSERT INTO poll_votes (guest_id, option_id) VALUES (?, ?)', [guest_id, optionId]);
       res.json({ id: optionId, name, emoji });
     });
+  });
+});
+
+// Backup endpoint
+app.get('/api/backup', (req, res) => {
+  const backup = { timestamp: new Date().toISOString() };
+  const tables = ['guests', 'comments', 'photos', 'poll_options', 'poll_votes'];
+  let completed = 0;
+
+  tables.forEach(table => {
+    db.all(`SELECT * FROM ${table}`, [], (err, rows) => {
+      if (!err) backup[table] = rows;
+      completed++;
+      
+      if (completed === tables.length) {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="dekolaudacka-backup-${Date.now()}.json"`);
+        res.json(backup);
+      }
+    });
+  });
+});
+
+// Restore endpoint
+app.post('/api/restore', (req, res) => {
+  const backup = req.body;
+  if (!backup || !backup.guests) return res.status(400).json({ error: 'Invalid backup' });
+
+  db.serialize(() => {
+    db.run('DELETE FROM poll_votes');
+    db.run('DELETE FROM comments');
+    db.run('DELETE FROM photos');
+    db.run('DELETE FROM poll_options');
+    db.run('DELETE FROM guests');
+
+    if (backup.guests) {
+      backup.guests.forEach(g => {
+        db.run('INSERT INTO guests (id, name, attending, avatar_color, created_at) VALUES (?, ?, ?, ?, ?)',
+          [g.id, g.name, g.attending, g.avatar_color, g.created_at]);
+      });
+    }
+
+    if (backup.comments) {
+      backup.comments.forEach(c => {
+        db.run('INSERT INTO comments (id, guest_id, comment, created_at) VALUES (?, ?, ?, ?)',
+          [c.id, c.guest_id, c.comment, c.created_at]);
+      });
+    }
+
+    if (backup.photos) {
+      backup.photos.forEach(p => {
+        db.run('INSERT INTO photos (id, guest_id, photo_url, drive_id, created_at) VALUES (?, ?, ?, ?, ?)',
+          [p.id, p.guest_id, p.photo_url, p.drive_id, p.created_at]);
+      });
+    }
+
+    if (backup.poll_options) {
+      backup.poll_options.forEach(o => {
+        db.run('INSERT INTO poll_options (id, name, emoji, created_at) VALUES (?, ?, ?, ?)',
+          [o.id, o.name, o.emoji, o.created_at]);
+      });
+    }
+
+    if (backup.poll_votes) {
+      backup.poll_votes.forEach(v => {
+        db.run('INSERT INTO poll_votes (id, guest_id, option_id, created_at) VALUES (?, ?, ?, ?)',
+          [v.id, v.guest_id, v.option_id, v.created_at]);
+      });
+    }
+
+    res.json({ success: true, message: 'Database restored' });
   });
 });
 
