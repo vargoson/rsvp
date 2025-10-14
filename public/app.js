@@ -1,10 +1,6 @@
-// API Base URL
 const API_URL = window.location.origin;
-
-// Current user state
 let currentGuest = null;
 
-// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadGuests();
     loadComments();
@@ -14,38 +10,26 @@ document.addEventListener('DOMContentLoaded', () => {
     checkCurrentUser();
 });
 
-// Setup event listeners
 function setupEventListeners() {
-    // RSVP form
-    const rsvpForm = document.getElementById('rsvpForm');
-    const buttons = rsvpForm.querySelectorAll('button[type="submit"]');
-    
-    buttons.forEach(button => {
-        button.addEventListener('click', (e) => {
+    const buttons = document.querySelectorAll('#rsvpForm button[type="submit"]');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
             e.preventDefault();
-            const attending = button.dataset.attending === 'true';
-            handleRSVP(attending);
+            handleRSVP(btn.dataset.attending === 'true');
         });
     });
 
-    // Comment form
-    const commentForm = document.getElementById('commentForm');
-    commentForm.addEventListener('submit', (e) => {
+    document.getElementById('commentForm').addEventListener('submit', (e) => {
         e.preventDefault();
         handleComment();
     });
 
-    // Photo form
-    const photoForm = document.getElementById('photoForm');
-    photoForm.addEventListener('submit', (e) => {
+    document.getElementById('photoForm').addEventListener('submit', (e) => {
         e.preventDefault();
         handlePhoto();
     });
-
-    // Poll options - will be set up after loading
 }
 
-// Check if user is already logged in (stored in localStorage)
 function checkCurrentUser() {
     const storedGuest = localStorage.getItem('currentGuest');
     if (storedGuest) {
@@ -54,7 +38,6 @@ function checkCurrentUser() {
     }
 }
 
-// Update UI based on user login state
 function updateUserInterface() {
     if (currentGuest) {
         document.getElementById('currentUser').textContent = currentGuest.name;
@@ -62,12 +45,11 @@ function updateUserInterface() {
         document.getElementById('userInfoPhotos').style.display = 'block';
         document.getElementById('commentForm').style.display = 'block';
         document.getElementById('addOptionForm').style.display = 'block';
-        loadComments(); // Reload to show form
-        loadPoll(); // Reload poll to show add option form
+        loadComments();
+        loadPoll();
     }
 }
 
-// Handle RSVP submission
 async function handleRSVP(attending) {
     const nameInput = document.getElementById('nameInput');
     const name = nameInput.value.trim();
@@ -89,14 +71,9 @@ async function handleRSVP(attending) {
         const data = await response.json();
         
         if (response.ok) {
-            // Store current guest
             currentGuest = { id: data.id, name: data.name, avatar_color: data.avatar_color };
             localStorage.setItem('currentGuest', JSON.stringify(currentGuest));
-            
-            showMessage(
-                attending ? `Super! Tešíme sa na teba, ${name}! 🎉` : `Škoda, že nemôžeš prísť, ${name} 😢`,
-                'success'
-            );
+            showMessage(attending ? `Super! Tešíme sa na teba, ${name}! 🎉` : `Škoda ${name} 😢`, 'success');
             nameInput.value = '';
             loadGuests();
             updateUserInterface();
@@ -108,7 +85,6 @@ async function handleRSVP(attending) {
     }
 }
 
-// Load and display guests
 async function loadGuests() {
     try {
         const response = await fetch(`${API_URL}/api/guests`);
@@ -120,7 +96,6 @@ async function loadGuests() {
     }
 }
 
-// Display guests in bubbles
 function displayGuests(guests) {
     const attendingContainer = document.getElementById('attendingGuests');
     const notAttendingContainer = document.getElementById('notAttendingGuests');
@@ -153,7 +128,6 @@ function displayGuests(guests) {
     }
 }
 
-// Handle comment submission
 async function handleComment() {
     if (!currentGuest) {
         showMessage('Najprv sa prihlás cez RSVP!', 'error');
@@ -191,7 +165,6 @@ async function handleComment() {
     }
 }
 
-// Load and display comments
 async function loadComments() {
     try {
         const response = await fetch(`${API_URL}/api/comments`);
@@ -203,7 +176,6 @@ async function loadComments() {
     }
 }
 
-// Display comments
 function displayComments(comments) {
     const commentsList = document.getElementById('commentsList');
     
@@ -236,21 +208,14 @@ function displayComments(comments) {
     }).join('');
 }
 
-// Handle photo submission
 async function handlePhoto() {
     if (!currentGuest) {
         showMessage('Najprv sa prihlás cez RSVP!', 'error');
         return;
     }
 
-    const photoUrlInput = document.getElementById('photoUrlInput');
-    let photoUrl = photoUrlInput.value.trim();
-    
-    if (!photoUrl) {
-        return;
-    }
-
-    // Convert Google Drive link to direct image link
+    let photoUrl = document.getElementById('photoUrlInput').value.trim();
+    if (!photoUrl) return;
     photoUrl = convertGoogleDriveUrl(photoUrl);
 
     try {
@@ -278,7 +243,6 @@ async function handlePhoto() {
     }
 }
 
-// Load and display photos
 async function loadPhotos() {
     try {
         const response = await fetch(`${API_URL}/api/photos`);
@@ -290,7 +254,6 @@ async function loadPhotos() {
     }
 }
 
-// Display photos
 function displayPhotos(photos) {
     const photosList = document.getElementById('photosList');
     
@@ -313,7 +276,6 @@ function displayPhotos(photos) {
     `).join('');
 }
 
-// Lightbox functions
 function openLightbox(imageUrl, caption) {
     const lightbox = document.getElementById('photoLightbox');
     const lightboxImg = document.getElementById('lightboxImage');
@@ -322,27 +284,17 @@ function openLightbox(imageUrl, caption) {
     lightbox.classList.add('active');
     lightboxImg.src = imageUrl;
     lightboxCaption.textContent = `Pridané: ${caption}`;
-    
-    // Prevent body scroll
     document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
-    const lightbox = document.getElementById('photoLightbox');
-    lightbox.classList.remove('active');
-    
-    // Restore body scroll
+    document.getElementById('photoLightbox').classList.remove('active');
     document.body.style.overflow = 'auto';
 }
 
-// Close lightbox on ESC key
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeLightbox();
-    }
+    if (e.key === 'Escape') closeLightbox();
 });
-
-// Utility functions
 
 function getInitials(name) {
     return name
@@ -354,7 +306,6 @@ function getInitials(name) {
 }
 
 function getQuirkyEmoji(name) {
-    // Quirky and unhinged emojis - animals, objects, and weird stuff
     const quirkyEmojis = [
         '🦖', '🦕', '🦄', '🦙', '🦥', '🦦', '🦨', '🦔', '🦇', '🐙', 
         '🦑', '🦞', '🦀', '🐡', '🦐', '🦚', '🦜', '🦩', '🦢', '🐧',
@@ -366,15 +317,9 @@ function getQuirkyEmoji(name) {
         '🧩', '🎮', '🕹️', '🎲', '🧸', '🪀', '🪁', '🎪', '🎡', '🎢',
         '🧙', '🧚', '🧛', '🧜', '🧝', '🧞', '🧟', '🦸', '🦹', '🥷'
     ];
-    
-    // Generate consistent emoji based on name (same name = same emoji)
     let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % quirkyEmojis.length;
-    
-    return quirkyEmojis[index];
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return quirkyEmojis[Math.abs(hash) % quirkyEmojis.length];
 }
 
 function showMessage(text, type = 'success') {
@@ -408,111 +353,67 @@ function escapeHtml(text) {
 }
 
 function convertGoogleDriveUrl(url) {
-    // Convert Google Drive sharing link to direct image link
     const match = url.match(/\/d\/(.+?)\//);
-    if (match) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-    }
-    return url;
+    return match ? `https://drive.google.com/uc?export=view&id=${match[1]}` : url;
 }
 
-// Calendar functions
-
 function addToGoogleCalendar() {
-    // Event details
-    const event = {
+    const e = {
         text: 'Dekolaudačka 🎉',
-        dates: '20251024T190000/20251024T230000', // Format: YYYYMMDDTHHMMSS
+        dates: '20251024T190000/20251024T230000',
         details: 'Posledná párty pred odchodom z domu! Nezabudni prísť! 🎊',
         location: 'Horovo náměstí 1074/2, Prague',
         ctz: 'Europe/Prague'
     };
-    
-    const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.text)}&dates=${event.dates}&details=${encodeURIComponent(event.details)}&location=${encodeURIComponent(event.location)}&ctz=${event.ctz}`;
-    
-    window.open(googleCalUrl, '_blank');
+    window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(e.text)}&dates=${e.dates}&details=${encodeURIComponent(e.details)}&location=${encodeURIComponent(e.location)}&ctz=${e.ctz}`, '_blank');
 }
 
 function downloadICS() {
-    // Generate ICS file for Apple Calendar, Outlook, etc.
-    const event = {
+    const e = {
         title: 'Dekolaudačka 🎉',
-        start: '20251024T190000', // 7 PM
-        end: '20251024T230000',   // 11 PM
-        description: 'Posledná párty pred odchodom z domu! Nezabudni prísť! 🎊',
+        start: '20251024T190000',
+        end: '20251024T230000',
+        description: 'Posledná párty pred odchodom z domu!',
         location: 'Horovo náměstí 1074/2, Prague'
     };
-    
-    const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Dekolaudačka//Party//SK
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-DTSTART:${event.start}
-DTEND:${event.end}
-DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
-SUMMARY:${event.title}
-DESCRIPTION:${event.description}
-LOCATION:${event.location}
-STATUS:CONFIRMED
-SEQUENCE:0
-END:VEVENT
-END:VCALENDAR`;
-
-    // Create blob and download
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = 'dekolaudacka.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART:${e.start}\nDTEND:${e.end}\nSUMMARY:${e.title}\nDESCRIPTION:${e.description}\nLOCATION:${e.location}\nEND:VEVENT\nEND:VCALENDAR`;
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dekolaudacka.ics';
+    a.click();
 }
-
-// Poll functions
 
 async function loadPoll() {
     try {
-        const response = await fetch(`${API_URL}/api/poll`);
-        const pollData = await response.json();
-        
-        displayPoll(pollData);
-    } catch (error) {
-        console.error('Error loading poll:', error);
+        const res = await fetch(`${API_URL}/api/poll`);
+        displayPoll(await res.json());
+    } catch (e) {
+        console.error(e);
     }
 }
 
-function displayPoll(pollData) {
+function displayPoll(data) {
     const pollOptions = document.getElementById('pollOptions');
-    
-    if (!pollData || pollData.length === 0) {
+    if (!data || data.length === 0) {
         pollOptions.innerHTML = '<div class="loading">Žiadne možnosti...</div>';
         return;
     }
+    const totalVotes = data.reduce((sum, o) => sum + o.vote_count, 0);
     
-    // Calculate total votes for percentages
-    const totalVotes = pollData.reduce((sum, option) => sum + option.vote_count, 0);
-    
-    pollOptions.innerHTML = pollData.map(option => {
-        const percentage = totalVotes > 0 ? (option.vote_count / totalVotes * 100).toFixed(0) : 0;
-        const hasVoted = currentGuest && option.voters && option.voters.includes(currentGuest.name);
-        const voters = option.voters || [];
+    pollOptions.innerHTML = data.map(o => {
+        const pct = totalVotes > 0 ? (o.vote_count / totalVotes * 100).toFixed(0) : 0;
+        const voted = currentGuest && o.voters && o.voters.includes(currentGuest.name);
+        const voters = o.voters || [];
         
-        return `
-            <div class="poll-option ${hasVoted ? 'voted' : ''} ${!currentGuest ? 'disabled' : ''}" 
-                 data-option-id="${option.id}"
-                 onclick="handlePollVote(${option.id})">
-                <div class="poll-option-bar" style="width: ${percentage}%"></div>
-                <div class="poll-option-header">
-                    <div class="poll-option-label">
-                        <span>${option.name}</span>
-                    </div>
-                    <span class="poll-option-votes">${option.vote_count} ${option.vote_count === 1 ? 'hlas' : option.vote_count < 5 ? 'hlasy' : 'hlasov'}</span>
-                </div>
-                ${voters.length > 0 ? `<div class="poll-option-voters">👥 ${voters.join(', ')}</div>` : ''}
+        return `<div class="poll-option ${voted ? 'voted' : ''} ${!currentGuest ? 'disabled' : ''}" onclick="handlePollVote(${o.id})">
+            <div class="poll-option-bar" style="width: ${pct}%"></div>
+            <div class="poll-option-header">
+                <div class="poll-option-label"><span>${o.name}</span></div>
+                <span class="poll-option-votes">${o.vote_count} ${o.vote_count === 1 ? 'hlas' : o.vote_count < 5 ? 'hlasy' : 'hlasov'}</span>
             </div>
-        `;
+            ${voters.length ? `<div class="poll-option-voters">👥 ${voters.join(', ')}</div>` : ''}
+        </div>`;
     }).join('');
     
     if (!currentGuest) {

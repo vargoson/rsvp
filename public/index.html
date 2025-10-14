@@ -80,6 +80,28 @@
 
                     </p>
                 </div>
+
+                <!-- Contact Section -->
+                <div class="contact-section">
+                    <h3>📞 Kontakty</h3>
+                    <p class="contact-intro"> Na instagrame dvíhajú len Gen Z, Katka už má šedivé vlasy, takže telefón, dík. </p>
+                    <div class="contact-grid">
+                        <div class="contact-item">
+                            <span class="contact-emoji">👤</span>
+                            <div class="contact-info">
+                                <strong>Soä</strong>
+                                <a href="tel:+421123456789">+420 608 845 217</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-emoji">👤</span>
+                            <div class="contact-info">
+                                <strong>Špala</strong>
+                                <a href="tel:+421987654321">+420 705 223 540</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -199,6 +221,13 @@
         <footer class="footer">
             <p></p>
         </footer>
+    </div>
+
+    <!-- Photo Lightbox -->
+    <div id="photoLightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImage" class="lightbox-content" onclick="event.stopPropagation()">
+        <div id="lightboxCaption" class="lightbox-caption"></div>
     </div>
 
     <script src="app.js"></script>
